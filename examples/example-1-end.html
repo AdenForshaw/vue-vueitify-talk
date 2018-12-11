@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href='https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons' rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <v-app>
+      <v-content>
+        <v-container grid-list-x1>
+            <v-card>
+                <v-layout align-center justify-center>
+                    <v-btn color="blue" dark large @click="getRandomImage" >
+                        Another &nbsp; <v-icon>refresh</v-icon>
+                    </v-btn>
+                </v-layout>
+
+                <v-layout row wrap>
+                    <v-flex xs12 >
+                        <v-img :src="image.url" contain height="600px">
+                        </v-img>
+                    </v-flex>
+                </v-layout>
+            </v-card>
+        </v-container>
+      </v-content>
+    </v-app>
+    </div>
+ 
+    <script>
+    new Vue({ 
+        el: '#app',
+        data(){
+            return {
+                image : {id:"", url:""}
+            }
+        },
+        created(){
+            this.getRandomImage();
+        } ,
+        methods:{
+            async getRandomImage()
+            {
+                try{
+                    let response = await axios.get('https://api.thecatapi.com/v1/images/search' ) // Ask for 1 Image, at full resolution
+                    
+                    this.image = response.data[0] // the response is an Array, so just use the first item as the Image
+
+                }catch(err){
+                    console.log(err)
+                }
+            }
+        }
+    })
+  </script>
+</body>
+</html>

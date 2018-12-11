@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href='https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons' rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <v-app>
+      <v-content>
+        <v-container>
+
+          <v-card>
+            <v-layout>
+                <!-- Order selection - Randpm, Descending, or Ascending -->
+                <v-flex xs6 offset-xs3>
+                    <v-select :items="categories"
+                            item-text="name"
+                            v-model="selected_category"
+                            label="Categories"
+                            return-object
+                            attach></v-select>
+                    </v-select>
+                </v-flex>
+            </v-layout>
+
+            <v-layout align-center justify-center>
+                <v-btn color="blue" dark large @click="getRandomImage" >
+                    Another &nbsp; <v-icon>refresh</v-icon>
+                </v-btn>
+            </v-layout>
+
+            <v-layout row wrap>
+                <v-flex xs12 >
+                <v-card flat tile class="d-flex">
+                    <v-img :src="image.url" contain height="500px">
+                    </v-img>
+                </v-card>
+                </v-flex>
+            </v-layout>
+          </v-card>
+        </v-container>
+      </v-content>
+    </v-app>
+    </div>
+ 
+    <script>
+    new Vue({ 
+        el: '#app',
+        data(){
+            return {
+                image : {id:"", url:""},
+                
+                categories:[],
+                selected_category:{}
+
+            }
+        },
+        created(){
+            axios.defaults.headers.common['x-api-key'] = "DEMO-API-KEY" // Replace this with your API Key
+            this.getCategories();
+        } ,
+        watch:{
+
+            selected_category: function()
+            {
+                this.getRandomImage();
+            }
+        },
+        methods:{
+            async getRandomImage()
+            {
+                try{
+
+                    let response = await axios.get('https://api.thecatapi.com/v1/images/search', { 
+                      params: { 
+                        category_ids: this.selected_category.id
+                        } 
+                      } ) 
+                    
+                    this.image = response.data[0] // the response is an Array, so just use the first item as the Image
+
+                }catch(err){
+                    console.log(err)
+                }
+            },
+            async getCategories()
+            {
+                try{
+                    let response = await axios.get('https://api.thecatapi.com/v1/categories/' ) 
+                    this.categories = response.data;
+                    
+                    // pick one to display initially
+                    this.selected_category = this.categories[0]
+                }catch(err){
+                    console.log(err)
+                }
+            }
+        }
+    })
+  </script>
+</body>
+</html>
